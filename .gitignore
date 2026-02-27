@@ -1,0 +1,9 @@
+_build/
+.merlin
+*.install
+*.cm*
+*.annot
+*.cmt*
+*.cmti
+.cache/
+.opam/

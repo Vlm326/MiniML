@@ -1,0 +1,6 @@
+# dune init project MiniML
+# OCAMLPARAM: unset
+# Shared cache: enabled-except-user-rules
+# Shared cache location: /home/vlm326/.cache/dune/db
+# Workspace root: /home/vlm326/Documents/Projects/Ocaml/MiniML
+# Auto-detected concurrency: 16

@@ -5,6 +5,7 @@ module Parser = struct
   type parser = { lexbuf : Lexer.lexbuf; mutable current_token : Lexer.token }
 
   let next parser = parser.current_token <- Lexer.next_token parser.lexbuf
+  let from_string s = { lexbuf = Lexer.from_string s; current_token = EOF }
 
   let rec parse parser =
     next parser;

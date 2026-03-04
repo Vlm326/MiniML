@@ -119,7 +119,7 @@ module Lexer = struct
     | Some '=' ->
         let _ = get lexer in
         EQ
-    | Some '<' -> (
+    | Some c when c = '<' -> (
         let _ = get lexer in
         match peek lexer with
         | Some '>' ->
@@ -187,15 +187,39 @@ module Lexer = struct
                 INT (-n)
             | _ -> MINUS)
         | c when c >= '0' && c <= '9' ->
-            let _ = get lexer in
-            let rest = read_int lexer in
             let n = Char.code c - Char.code '0' in
-            INT ((n * 10) + rest)
+            let _ = get lexer in
+            let rec loop acc =
+              match peek lexer with
+              | Some d when d >= '0' && d <= '9' ->
+                  let digit = int_of_string (String.make 1 d) in
+                  let _ = get lexer in
+                  loop ((acc * 10) + digit)
+              | _ -> acc
+            in
+            INT (loop n)
         | c when (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c = '_' ->
             let _ = get lexer in
             let s = read_ident lexer in
             let s = String.make 1 c ^ s in
             keywords s
+        | '<' -> (
+            let _ = get lexer in
+            match peek lexer with
+            | Some '>' ->
+                let _ = get lexer in
+                NEQ
+            | Some '=' ->
+                let _ = get lexer in
+                LE
+            | _ -> LT)
+        | '>' -> (
+            let _ = get lexer in
+            match peek lexer with
+            | Some '=' ->
+                let _ = get lexer in
+                GE
+            | _ -> GT)
         | _ ->
             let _ = get lexer in
             read_binop lexer)

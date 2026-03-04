@@ -77,12 +77,25 @@ module Parser = struct
               | _ -> failwith "Expected IDENT"
             in
             match parser.current_token with
-            | Lexer.EQ ->
+            | Lexer.EQ -> (
                 next parser;
-                let body = parse_expr parser in
-                expect Lexer.IN parser;
-                let rest = parse_expr parser in
-                LetRec (name, name, body, rest)
+                match parser.current_token with
+                | Lexer.FUN -> (
+                    next parser;
+                    match parser.current_token with
+                    | Lexer.IDENT param ->
+                        next parser;
+                        expect Lexer.ARROW parser;
+                        let body = parse_expr parser in
+                        expect Lexer.IN parser;
+                        let rest = parse_expr parser in
+                        LetRec (name, param, body, rest)
+                    | _ -> failwith "Expected parameter in let rec")
+                | _ ->
+                    let body = parse_expr parser in
+                    expect Lexer.IN parser;
+                    let rest = parse_expr parser in
+                    LetRec (name, name, body, rest))
             | _ ->
                 let param =
                   match parser.current_token with
@@ -100,6 +113,7 @@ module Parser = struct
             next parser;
             expect Lexer.EQ parser;
             let value = parse_expr parser in
+            expect Lexer.IN parser;
             Let (name, value, parse_expr parser)
         | _ -> failwith "Expected IDENT or REC")
     | _ -> parse_fun parser
@@ -183,7 +197,7 @@ module Parser = struct
     | MINUS ->
         next parser;
         UnOp (Neg, parse_unop parser)
-    | _ -> parse_atom parser
+    | _ -> parse_unary parser
 
   and parse_unary parser =
     match parser.current_token with

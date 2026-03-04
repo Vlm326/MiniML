@@ -5,6 +5,7 @@ module Parser : sig
   }
 
   val next : parser -> unit
+  val from_string : string -> parser
   val parse : parser -> Ast.expr
   val parse_expr : parser -> Ast.expr
   val expect : Lexer.Lexer.token -> parser -> unit

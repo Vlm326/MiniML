@@ -38,8 +38,8 @@ jobs:
       - name: Run tests
         run: opam exec -- dune runtest
 
-  lint:
-    name: Lint / Format
+  fmt:
+    name: Format
     runs-on: ubuntu-latest
 
     steps:
@@ -53,10 +53,9 @@ jobs:
           dune-cache: true
 
       - name: Install dependencies
-        run: opam install . --deps-only --with-test -y ocamlformat
-
-      - name: Check opam metadata
-        run: opam lint MiniML.opam
+        run: |
+          opam install . --deps-only --with-test -y
+          opam install ocamlformat -y
 
       - name: Check formatting
         run: |

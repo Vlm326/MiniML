@@ -47,5 +47,4 @@ let () =
   if Array.length Sys.argv > 1 then
     let fname = Sys.argv.(1) in
     run_and_print (read_file fname)
-  else
-    try repl () with End_of_file -> ()
+  else try repl () with End_of_file -> ()

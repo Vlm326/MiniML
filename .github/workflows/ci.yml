@@ -30,13 +30,13 @@ jobs:
           dune-cache: true
 
       - name: Install dependencies
-        run: opam install . --deps-only --with-test --with-doc -y
+        run: opam install . --deps-only --with-test -y
 
       - name: Build
-        run: dune build @all
+        run: opam exec -- dune build @all
 
       - name: Run tests
-        run: dune runtest
+        run: opam exec -- dune runtest
 
   lint:
     name: Lint / Format
@@ -53,7 +53,7 @@ jobs:
           dune-cache: true
 
       - name: Install dependencies
-        run: opam install . --deps-only --with-test -y
+        run: opam install . --deps-only --with-test -y ocamlformat
 
       - name: Check opam metadata
         run: opam lint MiniML.opam

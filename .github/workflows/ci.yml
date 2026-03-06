@@ -1,25 +1,64 @@
 name: CI
 
 on:
+  workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build:
+  test:
+    name: Test (OCaml ${{ matrix.ocaml-compiler }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ocaml-compiler: ["4.14", "5.2"]
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup OCaml
         uses: ocaml/setup-ocaml@v3
         with:
-          ocaml-compiler: 5.1.1
+          ocaml-compiler: ${{ matrix.ocaml-compiler }}
+          dune-cache: true
+
+      - name: Install dependencies
+        run: opam install . --deps-only --with-test --with-doc -y
+
+      - name: Build
+        run: dune build @all
+
+      - name: Run tests
+        run: dune runtest
+
+  lint:
+    name: Lint / Format
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup OCaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: "5.2"
+          dune-cache: true
 
       - name: Install dependencies
         run: opam install . --deps-only --with-test -y
 
-      - name: Build
-        run: dune build
+      - name: Check opam metadata
+        run: opam lint MiniML.opam
+
+      - name: Check formatting
+        run: |
+          opam exec -- dune fmt
+          git diff --exit-code

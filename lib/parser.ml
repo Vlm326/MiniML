@@ -210,12 +210,23 @@ module Parser = struct
     | _ -> parse_app parser
 
   and parse_app parser =
+    let rec parse_app_arg parser =
+      match parser.current_token with
+      | Lexer.FUN -> parse_fun parser
+      | Lexer.IF -> parse_if parser
+      | Lexer.LET -> parse_let parser
+      | _ -> parse_atom parser
+    in
+    let rec loop e =
+      match parser.current_token with
+      | Lexer.TRUE | Lexer.FALSE | Lexer.IDENT _ | Lexer.LPAREN | Lexer.FUN
+      | Lexer.IF | Lexer.LET | Lexer.INT _ ->
+          let arg = parse_app_arg parser in
+          loop (App (e, arg))
+      | _ -> e
+    in
     let e = parse_atom parser in
-    match parser.current_token with
-    | Lexer.TRUE | Lexer.FALSE | Lexer.IDENT _ | Lexer.LPAREN | Lexer.FUN
-    | Lexer.IF | Lexer.LET | Lexer.INT _ ->
-        App (e, parse_app parser)
-    | _ -> e
+    loop e
 
   and parse_atom parser =
     match parser.current_token with

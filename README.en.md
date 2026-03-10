@@ -6,7 +6,7 @@
 ![OCaml](https://img.shields.io/badge/OCaml-4.14%20%7C%205.2-fc7a03)
 ![Dune](https://img.shields.io/badge/build-Dune-8d5fd3)
 ![Formatter](https://img.shields.io/badge/formatter-ocamlformat-2a5ada)
-![License](https://img.shields.io/badge/license-not%20specified-lightgrey)
+![License](https://img.shields.io/badge/license-Apache%202.0-green)
 [![Stars](https://img.shields.io/github/stars/Vlm326/MiniML?style=flat)](https://github.com/Vlm326/MiniML/stargazers)
 [![Forks](https://img.shields.io/github/forks/Vlm326/MiniML?style=flat)](https://github.com/Vlm326/MiniML/network/members)
 [![Issues](https://img.shields.io/github/issues/Vlm326/MiniML)](https://github.com/Vlm326/MiniML/issues)
@@ -84,9 +84,9 @@ If you want to help the project, you can:
 - submit a pull request with a focused change
 - add tests or improve documentation
 
-## License Note
+## License
 
-At the moment, the repository does not include a `LICENSE` file, so the license is not explicitly specified yet.
+The project is distributed under the Apache License 2.0.
 
 ## Tooling
 

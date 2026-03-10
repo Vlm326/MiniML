@@ -6,7 +6,7 @@
 ![OCaml](https://img.shields.io/badge/OCaml-4.14%20%7C%205.2-fc7a03)
 ![Dune](https://img.shields.io/badge/build-Dune-8d5fd3)
 ![Formatter](https://img.shields.io/badge/formatter-ocamlformat-2a5ada)
-![License](https://img.shields.io/badge/license-not%20specified-lightgrey)
+![License](https://img.shields.io/badge/license-Apache%202.0-green)
 [![Stars](https://img.shields.io/github/stars/Vlm326/MiniML?style=flat)](https://github.com/Vlm326/MiniML/stargazers)
 [![Forks](https://img.shields.io/github/forks/Vlm326/MiniML?style=flat)](https://github.com/Vlm326/MiniML/network/members)
 [![Issues](https://img.shields.io/github/issues/Vlm326/MiniML)](https://github.com/Vlm326/MiniML/issues)
@@ -84,9 +84,9 @@ dune runtest
 - прислать pull request с небольшим сфокусированным изменением
 - добавить тесты и улучшить документацию
 
-## Примечание о лицензии
+## Лицензия
 
-На текущий момент файл `LICENSE` в репозитории отсутствует, поэтому лицензия пока явно не оформлена.
+Проект распространяется под лицензией Apache License 2.0.
 
 ## Инструменты
 

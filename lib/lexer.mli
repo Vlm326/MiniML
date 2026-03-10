@@ -39,6 +39,5 @@ module Lexer : sig
   val read_int : lexbuf -> int
   val read_ident : lexbuf -> string
   val keywords : string -> token
-  val read_binop : lexbuf -> token
   val next_token : lexbuf -> token
 end

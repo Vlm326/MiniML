@@ -5,22 +5,22 @@
 (generate_opam_files true)
 
 (source
- (github username/reponame))
+ (github Vlm326/MiniML))
 
-(authors "Author Name <author@example.com>")
+(authors "Vladislav <morozvv75@gmail.com>")
 
-(maintainers "Maintainer Name <maintainer@example.com>")
+(maintainers "Vladislav <morozvv75@gmail.com>")
 
-(license LICENSE)
+(license "Apache-2.0")
 
-(documentation https://url/to/documentation)
+(documentation "https://github.com/Vlm326/MiniML#readme")
 
 (package
  (name MiniML)
- (synopsis "A short synopsis")
- (description "A longer description")
+ (synopsis "A small MiniML interpreter in OCaml")
+ (description "Lexer, parser and evaluator for a tiny ML-like language")
  (depends ocaml)
  (tags
-  ("add topics" "to describe" your project)))
+  ("ocaml" "interpreter" "miniml" "compiler-construction")))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/reference/dune-project/index.html

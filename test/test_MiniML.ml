@@ -17,11 +17,11 @@ let expect_failure code expected_message =
         (Printf.sprintf "Expected failure `%s`, got `%s`" expected_message msg)
   | exn ->
       failwith
-        (Printf.sprintf "Expected Failure, got `%s`"
-           (Printexc.to_string exn))
+        (Printf.sprintf "Expected Failure, got `%s`" (Printexc.to_string exn))
 
 let () =
   expect_run "let add = fun x -> fun y -> x + y in add 3 4" "7";
   expect_failure "1 < 2 < 3" "Unexpected trailing token: LT";
   expect_failure "let rec f = 1 in f"
-    "let rec requires a function definition, use `let rec f x = ... in ...` or `let rec f = fun x -> ... in ...`"
+    "let rec requires a function definition, use `let rec f x = ... in ...` or \
+     `let rec f = fun x -> ... in ...`"

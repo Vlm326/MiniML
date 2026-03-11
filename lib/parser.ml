@@ -88,17 +88,20 @@ module Parser = struct
             | Lexer.EQ -> (
                 next parser;
                 match parser.current_token with
-                | Lexer.FUN -> (
+                | Lexer.FUN ->
                     next parser;
-                    let param = expect_ident parser "parameter after fun in let rec" in
+                    let param =
+                      expect_ident parser "parameter after fun in let rec"
+                    in
                     expect Lexer.ARROW parser;
                     let body = parse_expr parser in
                     expect Lexer.IN parser;
                     let rest = parse_expr parser in
-                    LetRec (name, param, body, rest))
+                    LetRec (name, param, body, rest)
                 | _ ->
                     failwith
-                      "let rec requires a function definition, use `let rec f x = ... in ...` or `let rec f = fun x -> ... in ...`")
+                      "let rec requires a function definition, use `let rec f \
+                       x = ... in ...` or `let rec f = fun x -> ... in ...`")
             | _ ->
                 let param = expect_ident parser "parameter in let rec" in
                 expect Lexer.EQ parser;
@@ -117,12 +120,12 @@ module Parser = struct
 
   and parse_fun parser =
     match parser.current_token with
-    | Lexer.FUN -> (
+    | Lexer.FUN ->
         next parser;
         let x = expect_ident parser "parameter after fun" in
         expect Lexer.ARROW parser;
         let body = parse_expr parser in
-        Fun (x, body))
+        Fun (x, body)
     | _ -> parse_or parser
 
   and parse_or parser =
@@ -241,5 +244,8 @@ module Parser = struct
         let e = parse_expr parser in
         expect Lexer.RPAREN parser;
         e
-    | _ -> failwith ("Unexpected token in expression: " ^ token_to_string parser.current_token)
+    | _ ->
+        failwith
+          ("Unexpected token in expression: "
+          ^ token_to_string parser.current_token)
 end

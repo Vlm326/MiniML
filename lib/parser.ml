@@ -7,48 +7,62 @@ module Parser = struct
   let next parser = parser.current_token <- Lexer.next_token parser.lexbuf
   let from_string s = { lexbuf = Lexer.from_string s; current_token = EOF }
 
+  let token_to_string = function
+    | Lexer.INT n -> Printf.sprintf "INT(%d)" n
+    | Lexer.BOOL b -> Printf.sprintf "BOOL(%b)" b
+    | Lexer.IDENT s -> Printf.sprintf "IDENT(%s)" s
+    | Lexer.TRUE -> "TRUE"
+    | Lexer.FALSE -> "FALSE"
+    | Lexer.IF -> "IF"
+    | Lexer.THEN -> "THEN"
+    | Lexer.ELSE -> "ELSE"
+    | Lexer.LET -> "LET"
+    | Lexer.REC -> "REC"
+    | Lexer.IN -> "IN"
+    | Lexer.FUN -> "FUN"
+    | Lexer.PLUS -> "PLUS"
+    | Lexer.MINUS -> "MINUS"
+    | Lexer.STAR -> "STAR"
+    | Lexer.SLASH -> "SLASH"
+    | Lexer.LPAREN -> "LPAREN"
+    | Lexer.RPAREN -> "RPAREN"
+    | Lexer.EQ -> "EQ"
+    | Lexer.NEQ -> "NEQ"
+    | Lexer.LT -> "LT"
+    | Lexer.LE -> "LE"
+    | Lexer.GT -> "GT"
+    | Lexer.GE -> "GE"
+    | Lexer.AND -> "AND"
+    | Lexer.OR -> "OR"
+    | Lexer.NOT -> "NOT"
+    | Lexer.ARROW -> "ARROW"
+    | Lexer.EOF -> "EOF"
+
+  let fail_expected expected actual =
+    failwith
+      (Printf.sprintf "Expected %s, got %s" expected (token_to_string actual))
+
   let rec parse parser =
     next parser;
-    parse_expr parser
+    let expr = parse_expr parser in
+    if parser.current_token <> EOF then
+      failwith
+        (Printf.sprintf "Unexpected trailing token: %s"
+           (token_to_string parser.current_token));
+    expr
 
   and parse_expr parser = parse_if parser
 
   and expect t parser =
     if parser.current_token = t then next parser
-    else
-      failwith
-        (Printf.sprintf "Expected token: "
-        ^
-        match t with
-        | Lexer.INT _ -> "INT"
-        | Lexer.BOOL _ -> "BOOL"
-        | Lexer.IDENT _ -> "IDENT"
-        | Lexer.TRUE -> "TRUE"
-        | Lexer.FALSE -> "FALSE"
-        | Lexer.IF -> "IF"
-        | Lexer.THEN -> "THEN"
-        | Lexer.ELSE -> "ELSE"
-        | Lexer.LET -> "LET"
-        | Lexer.REC -> "REC"
-        | Lexer.IN -> "IN"
-        | Lexer.FUN -> "FUN"
-        | Lexer.PLUS -> "PLUS"
-        | Lexer.MINUS -> "MINUS"
-        | Lexer.STAR -> "STAR"
-        | Lexer.SLASH -> "SLASH"
-        | Lexer.LPAREN -> "LPAREN"
-        | Lexer.RPAREN -> "RPAREN"
-        | Lexer.EQ -> "EQ"
-        | Lexer.NEQ -> "NEQ"
-        | Lexer.LT -> "LT"
-        | Lexer.LE -> "LE"
-        | Lexer.GT -> "GT"
-        | Lexer.GE -> "GE"
-        | Lexer.AND -> "AND"
-        | Lexer.OR -> "OR"
-        | Lexer.NOT -> "NOT"
-        | Lexer.ARROW -> "ARROW"
-        | Lexer.EOF -> "EOF")
+    else fail_expected (token_to_string t) parser.current_token
+
+  and expect_ident parser context =
+    match parser.current_token with
+    | Lexer.IDENT s ->
+        next parser;
+        s
+    | _ -> fail_expected context parser.current_token
 
   and parse_if parser =
     match parser.current_token with
@@ -69,41 +83,24 @@ module Parser = struct
         match parser.current_token with
         | Lexer.REC -> (
             next parser;
-            let name =
-              match parser.current_token with
-              | Lexer.IDENT s ->
-                  next parser;
-                  s
-              | _ -> failwith "Expected IDENT"
-            in
+            let name = expect_ident parser "function name after rec" in
             match parser.current_token with
             | Lexer.EQ -> (
                 next parser;
                 match parser.current_token with
                 | Lexer.FUN -> (
                     next parser;
-                    match parser.current_token with
-                    | Lexer.IDENT param ->
-                        next parser;
-                        expect Lexer.ARROW parser;
-                        let body = parse_expr parser in
-                        expect Lexer.IN parser;
-                        let rest = parse_expr parser in
-                        LetRec (name, param, body, rest)
-                    | _ -> failwith "Expected parameter in let rec")
-                | _ ->
+                    let param = expect_ident parser "parameter after fun in let rec" in
+                    expect Lexer.ARROW parser;
                     let body = parse_expr parser in
                     expect Lexer.IN parser;
                     let rest = parse_expr parser in
-                    LetRec (name, name, body, rest))
+                    LetRec (name, param, body, rest))
+                | _ ->
+                    failwith
+                      "let rec requires a function definition, use `let rec f x = ... in ...` or `let rec f = fun x -> ... in ...`")
             | _ ->
-                let param =
-                  match parser.current_token with
-                  | Lexer.IDENT s ->
-                      next parser;
-                      s
-                  | _ -> failwith "Expected parameter in let rec"
-                in
+                let param = expect_ident parser "parameter in let rec" in
                 expect Lexer.EQ parser;
                 let body = parse_expr parser in
                 expect Lexer.IN parser;
@@ -122,13 +119,10 @@ module Parser = struct
     match parser.current_token with
     | Lexer.FUN -> (
         next parser;
-        match parser.current_token with
-        | Lexer.IDENT x ->
-            next parser;
-            expect Lexer.ARROW parser;
-            let body = parse_expr parser in
-            Fun (x, body)
-        | _ -> failwith "Expected parameter in fun")
+        let x = expect_ident parser "parameter after fun" in
+        expect Lexer.ARROW parser;
+        let body = parse_expr parser in
+        Fun (x, body))
     | _ -> parse_or parser
 
   and parse_or parser =
@@ -247,11 +241,5 @@ module Parser = struct
         let e = parse_expr parser in
         expect Lexer.RPAREN parser;
         e
-    | _ ->
-        failwith
-          (Printf.sprintf "Unexpected token: %s"
-             (match parser.current_token with
-             | INT _ -> "INT"
-             | IDENT _ -> "IDENT"
-             | _ -> "?"))
+    | _ -> failwith ("Unexpected token in expression: " ^ token_to_string parser.current_token)
 end

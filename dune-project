@@ -19,7 +19,9 @@
  (name MiniML)
  (synopsis "A small MiniML interpreter in OCaml")
  (description "Lexer, parser and evaluator for a tiny ML-like language")
- (depends ocaml)
+ (depends
+  ocaml
+  (alcotest :with-test))
  (tags
   ("ocaml" "interpreter" "miniml" "compiler-construction")))
 

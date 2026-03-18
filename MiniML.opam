@@ -10,7 +10,7 @@ homepage: "https://github.com/Vlm326/MiniML"
 doc: "https://github.com/Vlm326/MiniML#readme"
 bug-reports: "https://github.com/Vlm326/MiniML/issues"
 depends: [
-  "dune" {>= "3.21"}
+  "dune" {>= "3.14"}
   "ocaml"
   "alcotest" {with-test}
   "odoc" {with-doc}
@@ -30,4 +30,3 @@ build: [
   ]
 ]
 dev-repo: "git+https://github.com/Vlm326/MiniML.git"
-x-maintenance-intent: ["(latest)"]

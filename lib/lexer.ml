@@ -102,56 +102,6 @@ module Lexer = struct
     | "not" -> NOT
     | _ -> IDENT s
 
-  let read_binop lexer =
-    match peek lexer with
-    | Some '+' ->
-        let _ = get lexer in
-        PLUS
-    | Some '-' ->
-        let _ = get lexer in
-        MINUS
-    | Some '*' ->
-        let _ = get lexer in
-        STAR
-    | Some '/' ->
-        let _ = get lexer in
-        SLASH
-    | Some '=' ->
-        let _ = get lexer in
-        EQ
-    | Some c when c = '<' -> (
-        let _ = get lexer in
-        match peek lexer with
-        | Some '>' ->
-            let _ = get lexer in
-            NEQ
-        | Some '=' ->
-            let _ = get lexer in
-            LE
-        | _ -> LT)
-    | Some '>' -> (
-        let _ = get lexer in
-        match peek lexer with
-        | Some '=' ->
-            let _ = get lexer in
-            GE
-        | _ -> GT)
-    | Some '&' -> (
-        let _ = get lexer in
-        match peek lexer with
-        | Some '&' ->
-            let _ = get lexer in
-            AND
-        | _ -> EOF)
-    | Some '|' -> (
-        let _ = get lexer in
-        match peek lexer with
-        | Some '|' ->
-            let _ = get lexer in
-            OR
-        | _ -> EOF)
-    | _ -> EOF
-
   let next_token lexer =
     skip_whitespaces lexer;
     match peek lexer with
@@ -220,7 +170,21 @@ module Lexer = struct
                 let _ = get lexer in
                 GE
             | _ -> GT)
+        | '&' -> (
+            let _ = get lexer in
+            match peek lexer with
+            | Some '&' ->
+                let _ = get lexer in
+                AND
+            | _ -> failwith "Unexpected character: &")
+        | '|' -> (
+            let _ = get lexer in
+            match peek lexer with
+            | Some '|' ->
+                let _ = get lexer in
+                OR
+            | _ -> failwith "Unexpected character: |")
         | _ ->
             let _ = get lexer in
-            read_binop lexer)
+            failwith (Printf.sprintf "Unexpected character: %c" c))
 end

@@ -207,7 +207,7 @@ module Parser = struct
     | _ -> parse_app parser
 
   and parse_app parser =
-    let rec parse_app_arg parser =
+    let parse_app_arg parser =
       match parser.current_token with
       | Lexer.FUN -> parse_fun parser
       | Lexer.IF -> parse_if parser

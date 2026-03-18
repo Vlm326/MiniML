@@ -1,6 +1,6 @@
 open MiniML
 
-let rec read_file fname =
+let read_file fname =
   let ch = open_in fname in
   let rec loop acc =
     try loop (input_line ch :: acc)

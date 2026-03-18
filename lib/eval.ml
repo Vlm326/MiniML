@@ -94,7 +94,7 @@ and eval_unop op v =
         (Printf.sprintf "Type error in unary operation %s: got %s"
            (unop_name op) (value_kind v))
 
-let rec value_to_string = function
+let value_to_string = function
   | IntValue n -> string_of_int n
   | BoolValue true -> "true"
   | BoolValue false -> "false"

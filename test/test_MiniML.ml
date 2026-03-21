@@ -320,9 +320,7 @@ let eval_tests =
       `Quick,
       expect_run "1 < 2 && 2 <= 2 && 3 > 2 && 3 >= 3" "true" );
     ("negative literal plus positive", `Quick, expect_run "-1 + 2" "1");
-    ( "subtraction associates left at runtime",
-      `Quick,
-      expect_run "1 - 2 - 3" "-4" );
+    ("subtraction associates left at runtime", `Quick, expect_run "1 - 2 - 3" "-4");
     ("division associates left at runtime", `Quick, expect_run "8 / 4 / 2" "1");
     ("unary minus over arithmetic", `Quick, expect_run "-(1 + 2)" "-3");
     ("not false", `Quick, expect_run "not false" "true");

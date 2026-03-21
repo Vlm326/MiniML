@@ -155,7 +155,8 @@ let lexer_tests =
             Lexer.Lexer.OR;
             Lexer.Lexer.IDENT "x_1";
             Lexer.Lexer.NEQ;
-            Lexer.Lexer.INT (-42);
+            Lexer.Lexer.MINUS;
+            Lexer.Lexer.INT 42;
             Lexer.Lexer.EOF;
           ]
           (collect_tokens
@@ -266,6 +267,20 @@ let parser_tests =
            ( Ast.Or,
              Ast.UnOp (Ast.Not, Ast.Bool false),
              Ast.BinOp (Ast.And, Ast.Bool true, Ast.Bool false) )) );
+    ( "unary minus binds tighter than addition",
+      `Quick,
+      expect_parse "-1 + 2"
+        (Ast.BinOp (Ast.Add, Ast.UnOp (Ast.Neg, Ast.Int 1), Ast.Int 2)) );
+    ( "subtraction associates left",
+      `Quick,
+      expect_parse "1 - 2 - 3"
+        (Ast.BinOp
+           (Ast.Sub, Ast.BinOp (Ast.Sub, Ast.Int 1, Ast.Int 2), Ast.Int 3)) );
+    ( "division associates left",
+      `Quick,
+      expect_parse "8 / 4 / 2"
+        (Ast.BinOp
+           (Ast.Div, Ast.BinOp (Ast.Div, Ast.Int 8, Ast.Int 4), Ast.Int 2)) );
     ( "trailing token is rejected",
       `Quick,
       expect_parse_failure "1 < 2 < 3" "Unexpected trailing token: LT" );
@@ -304,6 +319,11 @@ let eval_tests =
     ( "integer comparisons",
       `Quick,
       expect_run "1 < 2 && 2 <= 2 && 3 > 2 && 3 >= 3" "true" );
+    ("negative literal plus positive", `Quick, expect_run "-1 + 2" "1");
+    ( "subtraction associates left at runtime",
+      `Quick,
+      expect_run "1 - 2 - 3" "-4" );
+    ("division associates left at runtime", `Quick, expect_run "8 / 4 / 2" "1");
     ("unary minus over arithmetic", `Quick, expect_run "-(1 + 2)" "-3");
     ("not false", `Quick, expect_run "not false" "true");
     ("if false branch", `Quick, expect_run "if false then 1 else 2" "2");

@@ -55,7 +55,7 @@ jobs:
       - name: Install dependencies
         run: |
           opam install . --deps-only --with-test -y
-          opam install ocamlformat -y
+          opam install ocamlformat.0.28.1 -y
 
       - name: Check formatting
         run: |

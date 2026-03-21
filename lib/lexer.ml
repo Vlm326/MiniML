@@ -132,9 +132,6 @@ module Lexer = struct
             | Some '>' ->
                 let _ = get lexer in
                 ARROW
-            | Some d when d >= '0' && d <= '9' ->
-                let n = read_int lexer in
-                INT (-n)
             | _ -> MINUS)
         | c when c >= '0' && c <= '9' ->
             let n = Char.code c - Char.code '0' in

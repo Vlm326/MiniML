@@ -17,7 +17,6 @@ module Parser : sig
   val parse_rel : parser -> Ast.expr
   val parse_add : parser -> Ast.expr
   val parse_mul : parser -> Ast.expr
-  val parse_unop : parser -> Ast.expr
   val parse_unary : parser -> Ast.expr
   val parse_app : parser -> Ast.expr
   val parse_atom : parser -> Ast.expr

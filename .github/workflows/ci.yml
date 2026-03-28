@@ -13,7 +13,7 @@ concurrency:
 jobs:
   test:
     name: Test (OCaml ${{ matrix.ocaml-compiler }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -40,7 +40,7 @@ jobs:
 
   fmt:
     name: Format
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout
@@ -55,7 +55,7 @@ jobs:
       - name: Install dependencies
         run: |
           opam install . --deps-only --with-test -y
-          opam install ocamlformat -y
+          opam install ocamlformat.0.28.1 -y
 
       - name: Check formatting
         run: |

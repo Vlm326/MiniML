@@ -168,33 +168,30 @@ module Parser = struct
     | _ -> e
 
   and parse_add parser =
-    let e = parse_mul parser in
-    match parser.current_token with
-    | PLUS ->
-        next parser;
-        BinOp (Add, e, parse_add parser)
-    | MINUS ->
-        next parser;
-        BinOp (Sub, e, parse_add parser)
-    | _ -> e
+    let rec loop left =
+      match parser.current_token with
+      | PLUS ->
+          next parser;
+          loop (BinOp (Add, left, parse_mul parser))
+      | MINUS ->
+          next parser;
+          loop (BinOp (Sub, left, parse_mul parser))
+      | _ -> left
+    in
+    loop (parse_mul parser)
 
   and parse_mul parser =
-    let e = parse_unop parser in
-    match parser.current_token with
-    | STAR ->
-        next parser;
-        BinOp (Mul, e, parse_mul parser)
-    | SLASH ->
-        next parser;
-        BinOp (Div, e, parse_mul parser)
-    | _ -> e
-
-  and parse_unop parser =
-    match parser.current_token with
-    | MINUS ->
-        next parser;
-        UnOp (Neg, parse_unop parser)
-    | _ -> parse_unary parser
+    let rec loop left =
+      match parser.current_token with
+      | STAR ->
+          next parser;
+          loop (BinOp (Mul, left, parse_unary parser))
+      | SLASH ->
+          next parser;
+          loop (BinOp (Div, left, parse_unary parser))
+      | _ -> left
+    in
+    loop (parse_unary parser)
 
   and parse_unary parser =
     match parser.current_token with
@@ -207,7 +204,7 @@ module Parser = struct
     | _ -> parse_app parser
 
   and parse_app parser =
-    let rec parse_app_arg parser =
+    let parse_app_arg parser =
       match parser.current_token with
       | Lexer.FUN -> parse_fun parser
       | Lexer.IF -> parse_if parser

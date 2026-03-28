@@ -55,6 +55,36 @@ let rec eval (environment : env) (expression : expr) : value =
       | v ->
           failwith
             ("Cannot apply value of type " ^ value_kind v ^ " as a function"))
+  | BinOp (And, e1, e2) -> (
+      match eval environment e1 with
+      | BoolValue false -> BoolValue false
+      | BoolValue true -> (
+          match eval environment e2 with
+          | BoolValue b -> BoolValue b
+          | v2 ->
+              failwith
+                (Printf.sprintf
+                   "Type error in binary operation %s: got %s and %s"
+                   (binop_name And) "bool" (value_kind v2)))
+      | v1 ->
+          failwith
+            (Printf.sprintf "Type error in binary operation %s: got %s and %s"
+               (binop_name And) (value_kind v1) "bool"))
+  | BinOp (Or, e1, e2) -> (
+      match eval environment e1 with
+      | BoolValue true -> BoolValue true
+      | BoolValue false -> (
+          match eval environment e2 with
+          | BoolValue b -> BoolValue b
+          | v2 ->
+              failwith
+                (Printf.sprintf
+                   "Type error in binary operation %s: got %s and %s"
+                   (binop_name Or) "bool" (value_kind v2)))
+      | v1 ->
+          failwith
+            (Printf.sprintf "Type error in binary operation %s: got %s and %s"
+               (binop_name Or) (value_kind v1) "bool"))
   | BinOp (op, e1, e2) ->
       let v1 = eval environment e1 in
       let v2 = eval environment e2 in
@@ -78,8 +108,6 @@ and eval_binop op v1 v2 =
   | Le, IntValue n1, IntValue n2 -> BoolValue (n1 <= n2)
   | Gt, IntValue n1, IntValue n2 -> BoolValue (n1 > n2)
   | Ge, IntValue n1, IntValue n2 -> BoolValue (n1 >= n2)
-  | And, BoolValue n1, BoolValue n2 -> BoolValue (n1 && n2)
-  | Or, BoolValue n1, BoolValue n2 -> BoolValue (n1 || n2)
   | _ ->
       failwith
         (Printf.sprintf "Type error in binary operation %s: got %s and %s"

@@ -22,6 +22,83 @@ The project currently includes:
 - anonymous functions and function application
 - REPL mode and file execution
 
+## Language Grammar
+
+Below is the BNF grammar for MiniML, matching the current parser implementation:
+
+```bnf
+<program> ::= <expr>
+
+<expr> ::= <if-expr>
+         | <let-expr>
+         | <fun-expr>
+         | <or-expr>
+
+<if-expr> ::= "if" <expr> "then" <expr> "else" <expr>
+
+<let-expr> ::= "let" <ident> "=" <expr> "in" <expr>
+             | "let" "rec" <ident> <ident> "=" <expr> "in" <expr>
+             | "let" "rec" <ident> "=" "fun" <ident> "->" <expr> "in" <expr>
+
+<fun-expr> ::= "fun" <ident> "->" <expr>
+
+<or-expr> ::= <and-expr>
+            | <and-expr> "||" <or-expr>
+
+<and-expr> ::= <rel-expr>
+             | <rel-expr> "&&" <and-expr>
+
+<rel-expr> ::= <add-expr>
+             | <add-expr> "=" <add-expr>
+             | <add-expr> "<>" <add-expr>
+             | <add-expr> "<" <add-expr>
+             | <add-expr> "<=" <add-expr>
+             | <add-expr> ">" <add-expr>
+             | <add-expr> ">=" <add-expr>
+
+<add-expr> ::= <mul-expr>
+             | <add-expr> "+" <mul-expr>
+             | <add-expr> "-" <mul-expr>
+
+<mul-expr> ::= <unary-expr>
+             | <mul-expr> "*" <unary-expr>
+             | <mul-expr> "/" <unary-expr>
+
+<unary-expr> ::= "-" <unary-expr>
+               | "not" <unary-expr>
+               | <app-expr>
+
+<app-expr> ::= <atom>
+             | <app-expr> <app-arg>
+
+<app-arg> ::= <atom>
+            | <fun-expr>
+            | <if-expr>
+            | <let-expr>
+
+<atom> ::= <int>
+         | "true"
+         | "false"
+         | <ident>
+         | "(" <expr> ")"
+```
+
+Lexical elements:
+
+```bnf
+<ident> ::= letter { letter | digit | "_" }
+<int> ::= digit { digit }
+```
+
+Operator precedence, from highest to lowest:
+- function application
+- unary `-` and `not`
+- `*` and `/`
+- `+` and `-`
+- comparison operators
+- `&&`
+- `||`
+
 ## Example
 
 Example program:

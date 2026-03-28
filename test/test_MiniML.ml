@@ -304,6 +304,12 @@ let eval_tests =
     ( "integer comparisons",
       `Quick,
       expect_run "1 < 2 && 2 <= 2 && 3 > 2 && 3 >= 3" "true" );
+    ( "and short-circuits false branch",
+      `Quick,
+      expect_run "false && (10 / 0 = 1)" "false" );
+    ( "or short-circuits true branch",
+      `Quick,
+      expect_run "true || (10 / 0 = 1)" "true" );
     ("unary minus over arithmetic", `Quick, expect_run "-(1 + 2)" "-3");
     ("not false", `Quick, expect_run "not false" "true");
     ("if false branch", `Quick, expect_run "if false then 1 else 2" "2");

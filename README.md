@@ -154,6 +154,19 @@ dune exec MiniML -- path/to/program.ml
 dune runtest
 ```
 
+## Покрытие кода
+
+Для запуска тестов с покрытием через `bisect_ppx`:
+
+```bash
+find . -name '*.coverage' -delete
+dune runtest --instrument-with bisect_ppx --force
+bisect-ppx-report summary
+bisect-ppx-report html
+```
+
+После этого HTML-отчёт будет доступен в `_coverage/index.html`.
+
 ## Как помочь проекту
 
 Если хочешь помочь проекту, можно:

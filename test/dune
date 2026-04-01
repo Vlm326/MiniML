@@ -1,3 +1,5 @@
 (test
  (name test_MiniML)
- (libraries MiniML alcotest))
+ (libraries MiniML alcotest)
+ (instrumentation
+  (backend bisect_ppx)))

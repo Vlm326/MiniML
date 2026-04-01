@@ -21,7 +21,8 @@
  (description "Lexer, parser and evaluator for a tiny ML-like language")
  (depends
   ocaml
-  (alcotest :with-test))
+  (alcotest :with-test)
+  (bisect_ppx :with-test))
  (tags
   ("ocaml" "interpreter" "miniml" "compiler-construction")))
 

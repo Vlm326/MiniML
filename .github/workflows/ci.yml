@@ -61,3 +61,34 @@ jobs:
         run: |
           opam exec -- dune fmt
           git diff --exit-code
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup OCaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: "5.2"
+          dune-cache: true
+
+      - name: Install dependencies
+        run: opam install . --deps-only --with-test -y
+
+      - name: Run coverage
+        run: |
+          find . -name '*.coverage' -delete
+          rm -rf _coverage
+          opam exec -- dune runtest --instrument-with bisect_ppx --force
+          opam exec -- bisect-ppx-report summary
+          opam exec -- bisect-ppx-report html
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: _coverage

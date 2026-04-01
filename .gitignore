@@ -7,3 +7,5 @@ _build/
 *.cmti
 .cache/
 .opam/
+_coverage/
+bisect*.coverage

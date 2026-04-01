@@ -154,6 +154,19 @@ Run tests:
 dune runtest
 ```
 
+## Code Coverage
+
+To run tests with coverage via `bisect_ppx`:
+
+```bash
+find . -name '*.coverage' -delete
+dune runtest --instrument-with bisect_ppx --force
+bisect-ppx-report summary
+bisect-ppx-report html
+```
+
+The HTML report will then be available at `_coverage/index.html`.
+
 ## Contributing
 
 If you want to help the project, you can:

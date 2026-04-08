@@ -31,8 +31,8 @@ let rec string_of_expr = function
   | Ast.Let (name, value, body) ->
       Printf.sprintf "Let(%s,%s,%s)" name (string_of_expr value)
         (string_of_expr body)
-  | Ast.LetRec (name, arg, value, body) ->
-      Printf.sprintf "LetRec(%s,%s,%s,%s)" name arg (string_of_expr value)
+  | Ast.LetRec (name, value, body) ->
+      Printf.sprintf "LetRec(%s,%s,%s)" name (string_of_expr value)
         (string_of_expr body)
   | Ast.If (cond, then_branch, else_branch) ->
       Printf.sprintf "If(%s,%s,%s)" (string_of_expr cond)
@@ -241,25 +241,33 @@ let parser_tests =
         "let rec fact n = if n = 0 then 1 else n * fact (n - 1) in fact 4"
         (Ast.LetRec
            ( "fact",
-             "n",
-             Ast.If
-               ( Ast.BinOp (Ast.Eq, Ast.Var "n", Ast.Int 0),
-                 Ast.Int 1,
-                 Ast.BinOp
-                   ( Ast.Mul,
-                     Ast.Var "n",
-                     Ast.App
-                       ( Ast.Var "fact",
-                         Ast.BinOp (Ast.Sub, Ast.Var "n", Ast.Int 1) ) ) ),
+             Ast.Fun
+               ( "n",
+                 Ast.If
+                   ( Ast.BinOp (Ast.Eq, Ast.Var "n", Ast.Int 0),
+                     Ast.Int 1,
+                     Ast.BinOp
+                       ( Ast.Mul,
+                         Ast.Var "n",
+                         Ast.App
+                           ( Ast.Var "fact",
+                             Ast.BinOp (Ast.Sub, Ast.Var "n", Ast.Int 1) ) )
+                   ) ),
              Ast.App (Ast.Var "fact", Ast.Int 4) )) );
     ( "let rec with fun keyword",
       `Quick,
       expect_parse "let rec inc = fun x -> x + 1 in inc 2"
         (Ast.LetRec
            ( "inc",
-             "x",
-             Ast.BinOp (Ast.Add, Ast.Var "x", Ast.Int 1),
+             Ast.Fun ("x", Ast.BinOp (Ast.Add, Ast.Var "x", Ast.Int 1)),
              Ast.App (Ast.Var "inc", Ast.Int 2) )) );
+    ( "let rec allows non-function binding",
+      `Quick,
+      expect_parse "let rec answer = 40 + 2 in answer"
+        (Ast.LetRec
+           ( "answer",
+             Ast.BinOp (Ast.Add, Ast.Int 40, Ast.Int 2),
+             Ast.Var "answer" )) );
     ( "boolean operators",
       `Quick,
       expect_parse "not false || true && false"
@@ -290,11 +298,6 @@ let parser_tests =
     ( "missing if then branch separator",
       `Quick,
       expect_parse_failure "if true 1 else 2" "Expected THEN, got ELSE" );
-    ( "bare let rec value is rejected",
-      `Quick,
-      expect_parse_failure "let rec f = 1 in f"
-        "let rec requires a function definition, use `let rec f x = ... in \
-         ...` or `let rec f = fun x -> ... in ...`" );
     ( "unexpected token in atom",
       `Quick,
       expect_parse_failure ")" "Unexpected token in expression: RPAREN" );
@@ -310,6 +313,9 @@ let eval_tests =
       expect_run
         "let rec fact n = if n = 0 then 1 else n * fact (n - 1) in fact 5" "120"
     );
+    ( "recursive value binding",
+      `Quick,
+      expect_run "let rec answer = 40 + 2 in answer" "42" );
     ( "lexical scoping",
       `Quick,
       expect_run "let x = 10 in let f = fun y -> x + y in let x = 100 in f 5"
@@ -331,6 +337,9 @@ let eval_tests =
     ( "recursive function values stringify as fun",
       `Quick,
       expect_run "let rec id x = x in id" "<fun>" );
+    ( "cyclic recursive value binding fails",
+      `Quick,
+      expect_failure "let rec x = x in x" "Cyclic recursive binding: x" );
     ( "division by zero fails",
       `Quick,
       expect_failure "10 / 0" "you cannot divide by zero" );

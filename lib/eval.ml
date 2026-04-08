@@ -5,7 +5,7 @@ let value_kind = function
   | IntValue _ -> "int"
   | BoolValue _ -> "bool"
   | FunValue _ -> "function"
-  | RecFunValue _ -> "function"
+  | RecValue _ -> "value"
 
 let binop_name = function
   | Add -> "+"
@@ -28,15 +28,19 @@ let rec eval (environment : env) (expression : expr) : value =
   | Int n -> IntValue n
   | Bool b -> BoolValue b
   | Var x -> (
-      try List.assoc x environment
+      try force_value (List.assoc x environment)
       with Not_found -> failwith ("Unbound variable: " ^ x))
   | Fun (name, body) -> FunValue (name, body, environment)
   | Let (x, e1, e2) ->
       let v1 = eval environment e1 in
       eval ((x, v1) :: environment) e2
-  | LetRec (f, x, e1, e2) ->
-      let rec_closure = RecFunValue (f, x, e1, environment) in
-      eval ((f, rec_closure) :: environment) e2
+  | LetRec (x, e1, e2) ->
+      let env_ref = ref environment in
+      let state_ref = ref Unevaluated in
+      let recursive_value = RecValue (x, e1, env_ref, state_ref) in
+      let environment' = (x, recursive_value) :: environment in
+      env_ref := environment';
+      eval environment' e2
   | If (cond, then_branch, else_branch) -> (
       match eval environment cond with
       | BoolValue true -> eval environment then_branch
@@ -45,13 +49,10 @@ let rec eval (environment : env) (expression : expr) : value =
           failwith
             ("Condition of if-expression must be bool, got " ^ value_kind v))
   | App (e1, e2) -> (
-      match eval environment e1 with
+      match force_value (eval environment e1) with
       | FunValue (x, body, env') ->
           let v2 = eval environment e2 in
           eval ((x, v2) :: env') body
-      | RecFunValue (f, x, body, env') ->
-          let v2 = eval environment e2 in
-          eval ((f, RecFunValue (f, x, body, env')) :: (x, v2) :: env') body
       | v ->
           failwith
             ("Cannot apply value of type " ^ value_kind v ^ " as a function"))
@@ -93,6 +94,18 @@ let rec eval (environment : env) (expression : expr) : value =
       let v = eval environment e in
       eval_unop op v
 
+and force_value = function
+  | RecValue (name, expr, env_ref, state_ref) -> (
+      match !state_ref with
+      | Evaluated value -> value
+      | Evaluating -> failwith ("Cyclic recursive binding: " ^ name)
+      | Unevaluated ->
+          state_ref := Evaluating;
+          let value = eval !env_ref expr in
+          state_ref := Evaluated value;
+          value)
+  | value -> value
+
 and eval_binop op v1 v2 =
   match (op, v1, v2) with
   | Add, IntValue n1, IntValue n2 -> IntValue (n1 + n2)
@@ -122,12 +135,12 @@ and eval_unop op v =
         (Printf.sprintf "Type error in unary operation %s: got %s"
            (unop_name op) (value_kind v))
 
-let value_to_string = function
+let rec value_to_string = function
   | IntValue n -> string_of_int n
   | BoolValue true -> "true"
   | BoolValue false -> "false"
   | FunValue _ -> "<fun>"
-  | RecFunValue _ -> "<fun>"
+  | RecValue _ as value -> value_to_string (force_value value)
 
 let run code =
   let p = Parser.from_string code in

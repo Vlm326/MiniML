@@ -24,23 +24,31 @@ MiniML - это небольшой учебный проект на OCaml: ин�
 
 ## Грамматика языка
 
-Ниже приведена BNF-грамматика MiniML, соответствующая текущей реализации парсера:
+Ниже приведена BNF-грамматика MiniML, строго соответствующая текущей реализации парсера из `lib/parser.ml`:
 
 ```bnf
 <program> ::= <expr>
 
 <expr> ::= <if-expr>
-         | <let-expr>
-         | <fun-expr>
-         | <or-expr>
 
-<if-expr> ::= "if" <expr> "then" <expr> "else" <expr>
+<if-expr> ::= <if-form>
+            | <let-expr>
 
-<let-expr> ::= "let" <ident> "=" <expr> "in" <expr>
-             | "let" "rec" <ident> <ident> "=" <expr> "in" <expr>
-             | "let" "rec" <ident> "=" "fun" <ident> "->" <expr> "in" <expr>
+<if-form> ::= "if" <expr> "then" <expr> "else" <expr>
 
-<fun-expr> ::= "fun" <ident> "->" <expr>
+<let-expr> ::= <let-form>
+             | <fun-expr>
+
+<let-form> ::= "let" <let-binding>
+
+<let-binding> ::= <ident> "=" <expr> "in" <expr>
+                | "rec" <ident> "=" <expr> "in" <expr>
+                | "rec" <ident> <ident> "=" <expr> "in" <expr>
+
+<fun-expr> ::= <fun-form>
+             | <or-expr>
+
+<fun-form> ::= "fun" <ident> "->" <expr>
 
 <or-expr> ::= <and-expr>
             | <and-expr> "||" <or-expr>
@@ -56,25 +64,31 @@ MiniML - это небольшой учебный проект на OCaml: ин�
              | <add-expr> ">" <add-expr>
              | <add-expr> ">=" <add-expr>
 
-<add-expr> ::= <mul-expr>
-             | <add-expr> "+" <mul-expr>
-             | <add-expr> "-" <mul-expr>
+<add-expr> ::= <mul-expr> <add-tail>
 
-<mul-expr> ::= <unary-expr>
-             | <mul-expr> "*" <unary-expr>
-             | <mul-expr> "/" <unary-expr>
+<add-tail> ::= "+" <mul-expr> <add-tail>
+             | "-" <mul-expr> <add-tail>
+             | ε
+
+<mul-expr> ::= <unary-expr> <mul-tail>
+
+<mul-tail> ::= "*" <unary-expr> <mul-tail>
+             | "/" <unary-expr> <mul-tail>
+             | ε
 
 <unary-expr> ::= "-" <unary-expr>
                | "not" <unary-expr>
                | <app-expr>
 
-<app-expr> ::= <atom>
-             | <app-expr> <app-arg>
+<app-expr> ::= <atom> <app-tail>
+
+<app-tail> ::= <app-arg> <app-tail>
+             | ε
 
 <app-arg> ::= <atom>
-            | <fun-expr>
-            | <if-expr>
-            | <let-expr>
+            | <fun-form>
+            | <if-form>
+            | <let-form>
 
 <atom> ::= <int>
          | "true"
@@ -86,7 +100,9 @@ MiniML - это небольшой учебный проект на OCaml: ин�
 Лексические элементы:
 
 ```bnf
-<ident> ::= letter { letter | digit | "_" }
+<ident> ::= <ident-start> { <ident-char> }
+<ident-start> ::= letter | "_"
+<ident-char> ::= letter | digit | "_"
 <int> ::= digit { digit }
 ```
 

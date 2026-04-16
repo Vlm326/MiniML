@@ -85,30 +85,19 @@ module Parser = struct
             next parser;
             let name = expect_ident parser "function name after rec" in
             match parser.current_token with
-            | Lexer.EQ -> (
+            | Lexer.EQ ->
                 next parser;
-                match parser.current_token with
-                | Lexer.FUN ->
-                    next parser;
-                    let param =
-                      expect_ident parser "parameter after fun in let rec"
-                    in
-                    expect Lexer.ARROW parser;
-                    let body = parse_expr parser in
-                    expect Lexer.IN parser;
-                    let rest = parse_expr parser in
-                    LetRec (name, param, body, rest)
-                | _ ->
-                    failwith
-                      "let rec requires a function definition, use `let rec f \
-                       x = ... in ...` or `let rec f = fun x -> ... in ...`")
+                let value = parse_expr parser in
+                expect Lexer.IN parser;
+                let rest = parse_expr parser in
+                LetRec (name, value, rest)
             | _ ->
                 let param = expect_ident parser "parameter in let rec" in
                 expect Lexer.EQ parser;
                 let body = parse_expr parser in
                 expect Lexer.IN parser;
                 let rest = parse_expr parser in
-                LetRec (name, param, body, rest))
+                LetRec (name, Fun (param, body), rest))
         | Lexer.IDENT name ->
             next parser;
             expect Lexer.EQ parser;

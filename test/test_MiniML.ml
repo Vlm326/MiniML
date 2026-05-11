@@ -305,11 +305,35 @@ let eval_tests =
     ( "curried addition",
       `Quick,
       expect_run "let add = fun x -> fun y -> x + y in add 3 4" "7" );
+    ( "let rec evaluates (inline parameter)",
+      `Quick,
+      expect_run "let rec id x = x in id 42" "42" );
+    ( "let rec evaluates (fun keyword)",
+      `Quick,
+      expect_run "let rec inc = fun x -> x + 1 in inc 2" "3" );
     ( "recursive factorial",
       `Quick,
       expect_run
         "let rec fact n = if n = 0 then 1 else n * fact (n - 1) in fact 5" "120"
     );
+    ( "recursive fibonacci",
+      `Quick,
+      expect_run
+        "let rec fib n = if n <= 1 then n else fib (n - 1) + fib (n - 2) in \
+         fib 6"
+        "8" );
+    ( "let rec captures lexical environment",
+      `Quick,
+      expect_run
+        "let a = 10 in let rec f x = if x = 0 then a else f (x - 1) in let a = \
+         20 in f 0"
+        "10" );
+    ( "let rec is not affected by later shadowing",
+      `Quick,
+      expect_run
+        "let rec f x = if x = 0 then 0 else f (x - 1) in let g = f in let f = \
+         fun y -> 100 in g 1"
+        "0" );
     ( "lexical scoping",
       `Quick,
       expect_run "let x = 10 in let f = fun y -> x + y in let x = 100 in f 5"

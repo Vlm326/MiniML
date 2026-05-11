@@ -37,8 +37,8 @@ Below is the BNF grammar for MiniML, matching the current parser implementation:
 <if-expr> ::= "if" <expr> "then" <expr> "else" <expr>
 
 <let-expr> ::= "let" <ident> "=" <expr> "in" <expr>
+             | "let" "rec" <ident> "=" <expr> "in" <expr>
              | "let" "rec" <ident> <ident> "=" <expr> "in" <expr>
-             | "let" "rec" <ident> "=" "fun" <ident> "->" <expr> "in" <expr>
 
 <fun-expr> ::= "fun" <ident> "->" <expr>
 

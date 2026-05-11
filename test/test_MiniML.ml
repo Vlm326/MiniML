@@ -251,8 +251,8 @@ let parser_tests =
                          Ast.Var "n",
                          Ast.App
                            ( Ast.Var "fact",
-                             Ast.BinOp (Ast.Sub, Ast.Var "n", Ast.Int 1) ) )
-                   ) ),
+                             Ast.BinOp (Ast.Sub, Ast.Var "n", Ast.Int 1) ) ) )
+               ),
              Ast.App (Ast.Var "fact", Ast.Int 4) )) );
     ( "let rec with fun keyword",
       `Quick,

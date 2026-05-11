@@ -28,10 +28,7 @@ and binop = Add | Sub | Mul | Div | Eq | Neq | Lt | Le | Gt | Ge | And | Or
 and unop = Neg | Not
 
 (* Состояние вычисления рекурсивного связывания *)
-type rec_state =
-  | Unevaluated
-  | Evaluating
-  | Evaluated of value
+type rec_state = Unevaluated | Evaluating | Evaluated of value
 
 (* Значения времени выполнения *)
 and value =

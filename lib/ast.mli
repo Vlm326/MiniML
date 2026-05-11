@@ -13,10 +13,7 @@ type expr =
 and binop = Add | Sub | Mul | Div | Eq | Neq | Lt | Le | Gt | Ge | And | Or
 and unop = Neg | Not
 
-type rec_state =
-  | Unevaluated
-  | Evaluating
-  | Evaluated of value
+type rec_state = Unevaluated | Evaluating | Evaluated of value
 
 and value =
   | IntValue of int

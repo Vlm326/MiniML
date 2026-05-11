@@ -308,6 +308,12 @@ let eval_tests =
     ( "curried addition",
       `Quick,
       expect_run "let add = fun x -> fun y -> x + y in add 3 4" "7" );
+    ( "let rec evaluates (inline parameter)",
+      `Quick,
+      expect_run "let rec id x = x in id 42" "42" );
+    ( "let rec evaluates (fun keyword)",
+      `Quick,
+      expect_run "let rec inc = fun x -> x + 1 in inc 2" "3" );
     ( "recursive factorial",
       `Quick,
       expect_run

@@ -92,3 +92,9 @@ jobs:
         with:
           name: coverage-report
           path: _coverage
+
+      - name: Upload to CodeCov
+        uses: codecov/codecov-action@v5
+        with:
+          files: bisect*.coverage
+          fail_ci_if_error: false

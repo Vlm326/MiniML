@@ -3,6 +3,7 @@
 [Русская версия](./README.md)
 
 [![CI](https://github.com/Vlm326/MiniML/actions/workflows/ci.yml/badge.svg)](https://github.com/Vlm326/MiniML/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/Vlm326/MiniML/branch/main/graph/badge.svg)](https://codecov.io/gh/Vlm326/MiniML)
 ![OCaml](https://img.shields.io/badge/OCaml-4.14%20%7C%205.2-fc7a03)
 ![Dune](https://img.shields.io/badge/build-Dune-8d5fd3)
 ![Formatter](https://img.shields.io/badge/formatter-ocamlformat-2a5ada)
